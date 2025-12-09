@@ -3,8 +3,10 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -14,10 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,11 +86,24 @@ public class EmployeeController {
     @PostMapping
     @ApiOperation("新增员工")
     public Result saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        //对于DTO要加上注解
+        //对于json要加上注解@RequestBody，后面会有Query格式的，相应的就不需要加注解
         //在实体类的包中已经定义了这个DTO，用于接收前端传来的数据
         log.info("新增员工：{}", employeeDTO);
         employeeService.saveEmployee(employeeDTO);
         return Result.success();
+    }
+
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
+    @GetMapping("/page")
+    @ApiOperation("员工分页查询")
+    public Result<PageResult> pageEmployee(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("员工分页查询，参数为：{}", employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
     }
 
 }
