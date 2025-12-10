@@ -79,12 +79,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置密码，默认是123456，因为我们加了md5加密，所以这里也得处理
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         //设置当前记录的创建时间和修改时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         //设置当前记录创建人id和修改人id
-        employee.setCreateUser(BaseContext.getCurrentId());//将ThreadLocal中的值取出来
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //employee.setCreateUser(BaseContext.getCurrentId());//将ThreadLocal中的值取出来
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         //以上代码就实现了一个新的用户的创建，需要将它写入数据库中
         employeeMapper.insert(employee);//通过Mapper将数据添加到数据库中
@@ -142,8 +142,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);//通过拷贝传递属性参数
 
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);//在禁用启用用户状态的时候我们就已经实现了这个功能
     }
