@@ -134,6 +134,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    /**
+     * 修改用户信息，需要提交完整的用户信息
+     * @param employeeDTO
+     */
     public void update(EmployeeDTO employeeDTO){
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);//通过拷贝传递属性参数
