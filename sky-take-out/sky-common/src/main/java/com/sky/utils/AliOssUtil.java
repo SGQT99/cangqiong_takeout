@@ -21,7 +21,7 @@ public class AliOssUtil {
 
     /**
      * 文件上传
-     *
+     * 调用这个工具类可以实现文件上传，需要为上面四个属性赋值才能上传到阿里云
      * @param bytes
      * @param objectName
      * @return
@@ -59,7 +59,7 @@ public class AliOssUtil {
                 .append(".")
                 .append(endpoint)
                 .append("/")
-                .append(objectName);
+                .append(objectName);//对应图片文件的网址
 
         log.info("文件上传到:{}", stringBuilder.toString());
 
