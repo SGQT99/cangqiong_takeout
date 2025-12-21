@@ -19,10 +19,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.github.pagehelper.Page;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -34,6 +37,17 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    /**
+     * 清理缓存数据
+     * @param pattern
+     */
+    private void cleanCache(String pattern){
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
+    }
 
     /**
      * 新增菜品和对应的品味
@@ -58,6 +72,12 @@ public class DishServiceImpl implements DishService {
             }//遍历赋值，主表和从表也有了一定的联系
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+
+        Long categoryId = dish.getCategoryId();
+        String key = "dish_"+categoryId;
+
+        redisTemplate.delete(key);
+
     }
 
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
@@ -89,6 +109,8 @@ public class DishServiceImpl implements DishService {
             //删除菜品关联的口味数据
             dishFlavorMapper.deleteByDishId(id);//
         }
+
+        cleanCache("dish_*");//因为要删除特定的菜品缓存，还需要先查询分类id，所以这里直接删除所有的分类菜品
     }
 
     public DishVO getByIdWithFlavor(Long id) {
@@ -120,6 +142,7 @@ public class DishServiceImpl implements DishService {
             }
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+        cleanCache("dish_*");
     }
 
     /**
@@ -133,5 +156,27 @@ public class DishServiceImpl implements DishService {
                 .status(StatusConstant.ENABLE)//只有菜品是启用状态的时候才能够被查询的到
                 .build();//根据传进来的参数，创建dish实体对象
         return dishMapper.list(dish);
+    }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+        return dishVOList;
     }
 }
