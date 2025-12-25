@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("UserOrderController")
 @RequestMapping("/user/order")
 @Slf4j
 @Api(tags = "C端用户下单相关接口")
